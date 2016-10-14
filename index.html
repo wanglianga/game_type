@@ -1,0 +1,288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Document</title>
+</head>
+<style>
+	html,body{
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		background: #000;
+		color:#fff;
+	}
+	.options{
+		width: 100%;
+		height: 30px;
+		background: #ccc;
+		position: fixed;
+		bottom: 0px;
+		z-index: 20;
+	}
+	.options div{
+		width: 16%;
+		height: 30px;
+		float: left;
+		text-align: center;
+		line-height: 30px;
+		color: red;
+	}
+	.zimu{
+        font-weight: bolder;
+        background:url(image/zasimu.png);
+        background-position:-10px -10px;  
+        background-repeat: no-repeat;
+        background-size: cover;
+        text-align: center;
+        margin:15px;
+}
+.body{
+	width: 100%;
+	height: 100%;
+	background: url(image/80684e386bf49385bd7111267383c9a897a84d9d74460-7jjB6e.jpg);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 100%;
+	background-position: 0px -10px;
+}
+.btn{
+  height: 48px;
+  width: 128px;
+  background:url(image/anniu.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: absolute;
+  z-index: 33;
+  position: absolute;
+  bottom: 30px;
+  left: 40%;
+  margin-left: -64px;
+  cursor:pointer;
+  border-radius: 13%;
+  z-index: 9999
+
+
+}
+.zanting{
+  height: 48px;
+  width: 128px;
+  background: red;
+   position: absolute;
+   bottom: 30px;
+   right: 40%;
+   z-index: 8888;
+   text-align: center;
+   line-height: 48px;
+   border-radius: 30px;
+   font-size: 18px;
+   color: #eee;
+   font-weight: bold;
+}
+</style>
+<body>
+	<div class="body">
+		<div class="btn"></div>
+		<div class="zanting">暂停</div>
+		<div class="options">
+		<div>生命:</div>
+		<div class="life">10</div>
+		<div>分值:</div>
+		<div class="score">
+			0
+		</div>
+		<div>关卡：</div>
+		<div class="guanka">1</div>;
+	</div>
+	</div>
+	
+</body>
+<script src="functions.js"></script>
+<script src="animate.js"></script>
+<script>
+
+
+
+
+	
+
+
+   function gameplay(){
+   	//1.字母出现>出现哪几个（随机出现）>出现的字母不能一样
+		var arr=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+		var life=10;
+		var score=0;
+		var guankaa=$(".guanka")[0];
+		var lifea=$(".life")[0];
+		var scorea=$(".score")[0];
+		var speed=1;
+		var geshu=3;
+		var t;
+		var guanka=1;
+	    var arrayword=[];              //当前页面存在的字母
+	    getRand(arr,geshu);
+	    var arraytitle=[];             //当前页面存在的span
+	    createLetter(arrayword);
+	    move(lifea);
+	    key(lifea,scorea);
+
+
+   	//5.字母落下
+	function move(lifea){
+		var dh=document.documentElement.clientHeight;
+        t=setInterval(function(){
+      for (var i = 0; i < arraytitle.length; i++) {
+	    		var tops=arraytitle[i].offsetTop+speed;
+	    		arraytitle[i].style.top=tops+"px";
+	    		if(tops>dh){
+                   document.body.removeChild(arraytitle[i]);
+                     arrayword.splice(i,1);
+                     arraytitle.splice(i,1);
+                   createLetter(getRand(arr,1));
+                   life--;
+                   lifea.innerHTML=life;
+                   if (life<=0) {
+                   	alert("game over!")
+                   	location.reload();
+                   }
+
+	    		}
+	    	}
+     },100) 
+	}
+
+	//6.键盘事件
+	function key(lifea,scorea){
+       document.onkeydown=function(e){
+       	var e=e||window.event;
+        for(i=0;i<arraytitle.length;i++){
+        	var key=String.fromCharCode(e.keyCode);
+        	if (key==arraytitle[i].innerHTML) {
+            document.body.removeChild(arraytitle[i]);
+            arrayword.splice(i,1);
+            arraytitle.splice(i,1);
+            createLetter(getRand(arr,1));
+            score++;
+            scorea.innerHTML=score;
+            if (score>=guanka*10) {
+            	alert("恭喜你进入下一关！");
+            	next(lifea,scorea);
+
+            }
+        	}
+        }
+       }
+	}
+	function next(lifea,scorea){
+     clearInterval(t);  
+     guanka+=1; 
+     guankaa.innerHTML=guanka;
+     for(var j=0;j<arraytitle.length;j++){
+     	document.body.removeChild(arraytitle[j])
+     }
+   
+     speed+=1;
+     if (speed>20) {
+     	speed=20
+     };
+     geshu+=1;
+     if (geshu>5) {
+     	geshu=5;
+     };
+  
+     arraytitle=[];
+     arrayword=[];
+     getRand(arr,geshu);
+     createLetter(arrayword);
+     move(lifea);
+     key(lifea,scorea);
+	}
+	//1.随机的从某个数组里面取指定的随机元素
+	 //*1.用来检测当前页面中的数组
+	 //*2.返回当前这一次找到的字母
+     
+
+	function getRand(arr,num){                      //arr表示取随机数的范围，num表示要取几个随机元素
+		var newarr=[];                              //创建一个新数组，用来存放取出来的随机元素
+		for(var i=0;i<num;i++){                     //限制循环次数
+			var letter=arr[Math.floor(Math.random()*arr.length)];      //通过随机改变数组下标的方式获取随机元素letter
+			while(checkRand(letter,arrayword)){          //不知道判断次数，用while判断取出来的随机元素在新数组中是否存在
+				var letter=arr[Math.floor(Math.random()*arr.length)]; 
+			}
+			newarr.push(letter);                    //当判断不存在时，把取出来的随机元素放到新的数组中
+			arrayword.push(letter);
+                                                
+		}
+		return newarr;                             //返回新数组
+	}
+  //2.判断随机数在要放入的数组中是否存在
+	function checkRand(val,arr){                   //val表示取出来的随机元素  arr表示新数组
+		for(var i=0;i<arr.length;i++){             //遍历来判断随机数在新数组中是否存在
+			if (val==arr[i]) {
+				return true;
+			}
+
+		}
+         return false;
+	}                                   
+
+
+
+
+	// 3.将指定的数组里面的元素放到html页面当中
+	function createLetter(arr){                      //arr表示前面取到的新数组
+		var dw=document.documentElement.clientWidth; //dw表示浏览器的实际宽度
+		var newarr=[];                               //再定义一个新数组
+      for(var i=0;i<arr.length;i++){                 //遍历这个数组
+         var span=document.createElement('span');    //通过标签名创建新的标签 span
+         span.innerHTML=arr[i];                      //把数组中的元素赋值给span标签中的内容
+                                                       
+            var lefts=(100+Math.random()*(dw-200));   //限制随机元素在浏览器中可以出现的左右位置（取随机数）
+            var tops=(Math.random()*50);
+         	span.lefts=lefts;
+         	span.tops=tops;
+         while(checkPos(span,newarr)){
+         	lefts=(100+Math.random()*(dw-200));
+         	tops=(Math.random()*10);
+         	span.lefts=lefts;
+         	span.tops=tops;
+         }
+         	newarr.push(span);
+         	arraytitle.push(span);
+         	span.className="zimu";
+         	span.style.cssText="position:absolute;left:"+lefts+"px;top:"+tops+"px;width:50px;height:75px;font-size:20px;color:yellow;";
+         	document.body.appendChild(span);   
+      }
+      return newarr;
+	}
+
+    //4.检查元素是否位置重合
+	function checkPos(ele,eleArr){
+        for (i=0;i<eleArr.length;i++){
+          if(ele.lefts>eleArr[i].lefts-175&&ele.lefts<eleArr[i].lefts+175){
+          	return true
+          }
+        }
+        return false;
+	}
+
+   }
+var btn=$(".btn")[0];
+var zanting=$(".zanting")[0];
+btn.onclick=function(){
+	animate(btn,{left:50},500);
+	animate(zanting,{right:0},500);
+	gameplay();
+
+}
+zanting.onclick=function(){
+	alert("暂停中...")
+}
+	
+
+  
+
+</script>
+</html>
